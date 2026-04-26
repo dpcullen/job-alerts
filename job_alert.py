@@ -109,15 +109,24 @@ def fetch_ashby(org_id: str) -> list[dict]:
     data = _get(f"https://api.ashbyhq.com/posting-api/job-board/{org_id}")
     if not data:
         return []
+    # Ashby boards vary: some use top-level "jobs", others nest under "results.jobPostings"
+    jobs = (
+        data.get("jobs")
+        or (data.get("results") or {}).get("jobPostings")
+        or data.get("jobPostings")
+        or []
+    )
     return [
         {
             "id": f"ab_{j['id']}",
             "title": j.get("title", ""),
-            "location": j.get("locationName", "") or "",
-            "url": j.get("jobPostingUrl", ""),
-            "department": j.get("departmentName", "") or "",
+            "location": (
+                j.get("location") or j.get("locationName") or ""
+            ) if isinstance(j.get("location") or j.get("locationName"), str) else "",
+            "url": j.get("jobUrl") or j.get("jobPostingUrl", ""),
+            "department": j.get("department") or j.get("departmentName", "") or "",
         }
-        for j in (data.get("results") or data).get("jobPostings", [])
+        for j in jobs
     ]
 
 

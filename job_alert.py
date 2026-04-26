@@ -117,7 +117,7 @@ def fetch_ashby(org_id: str) -> list[dict]:
             "url": j.get("jobPostingUrl", ""),
             "department": j.get("departmentName", "") or "",
         }
-        for j in data.get("jobPostings", [])
+        for j in (data.get("results") or data).get("jobPostings", [])
     ]
 
 

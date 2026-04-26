@@ -8,11 +8,11 @@
 
 companies:
   - name: OpenAI
-    board: greenhouse
+    board: ashby
     board_id: openai
 
   - name: Anthropic
-    board: lever
+    board: greenhouse
     board_id: anthropic
 
 # ── How to add a company ──────────────────────────────────────────────────────

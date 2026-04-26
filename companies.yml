@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# COMPANIES TO WATCH
+# Add or remove companies here — no coding required.
+#
+# Supported board types: greenhouse | lever | ashby
+# The board_id is the company's slug on that job board platform.
+# ─────────────────────────────────────────────────────────────────────────────
+
+companies:
+  - name: OpenAI
+    board: greenhouse
+    board_id: openai
+
+  - name: Anthropic
+    board: lever
+    board_id: anthropic
+
+# ── How to add a company ──────────────────────────────────────────────────────
+# 1. Find the company's job board URL, e.g. jobs.lever.co/stripe
+# 2. The board type is in the URL (lever.co → lever, greenhouse.io → greenhouse)
+# 3. The board_id is the slug after the domain, e.g. "stripe"
+# 4. Paste the 3 lines below (removing the # signs) and fill in the details:
+#
+# - name: Company Name
+#   board: lever
+#   board_id: company-slug
+#
+# ── Common examples ───────────────────────────────────────────────────────────
+# - name: Stripe
+#   board: greenhouse
+#   board_id: stripe
+#
+# - name: Notion
+#   board: greenhouse
+#   board_id: notion
+#
+# - name: Figma
+#   board: greenhouse
+#   board_id: figma
+#
+# - name: Cohere
+#   board: greenhouse
+#   board_id: cohere
+#
+# - name: Scale AI
+#   board: greenhouse
+#   board_id: scaleai

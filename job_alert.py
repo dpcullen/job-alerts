@@ -179,47 +179,45 @@ def build_email(results: list[dict], is_first_run: bool) -> str:
     today = datetime.now().strftime("%B %d, %Y")
     total = sum(len(r["jobs"]) for r in results)
 
-    sections = []
+    # Flatten all jobs into one list, sorted: strong fits first, then possible, then unclear
+    fit_order = {"🟢": 0, "🟡": 1, "⚪": 2}
+    all_rows = []
     for company_result in results:
-        jobs = company_result["jobs"]
-        if not jobs:
-            continue
-
-        rows = []
-        for job in jobs:
+        for job in company_result["jobs"]:
             emoji, reason = score_job(job["title"], job["department"])
-            loc = job["location"] or "Remote / Not specified"
-            dept_html = (
-                f'<div style="color:#999;font-size:11px;margin-top:2px;">{job["department"]}</div>'
-                if job["department"] else ""
-            )
-            rows.append(f"""
-            <tr style="border-top:1px solid #f0f0f0;">
-              <td style="padding:12px 14px;vertical-align:top;">
-                <a href="{job['url']}" style="color:#1565C0;font-weight:600;text-decoration:none;font-size:14px;">{job['title']}</a>
-                <div style="color:#777;font-size:12px;margin-top:3px;">📍 {loc}</div>
-                {dept_html}
-              </td>
-              <td style="padding:12px 14px;vertical-align:middle;text-align:center;font-size:18px;">{emoji}</td>
-              <td style="padding:12px 14px;vertical-align:middle;font-size:12px;color:#555;min-width:180px;">{reason}</td>
-            </tr>""")
+            all_rows.append((fit_order[emoji], company_result["company"], job, emoji, reason))
+    all_rows.sort(key=lambda x: x[0])
 
-        count = len(jobs)
-        sections.append(f"""
-        <div style="margin-bottom:28px;">
-          <h2 style="margin:0 0 10px;font-size:16px;color:#111;border-bottom:2px solid #e8e8e8;padding-bottom:7px;">
-            {company_result['company']}
-            <span style="font-weight:400;color:#888;font-size:13px;">&nbsp; {count} new role{"s" if count != 1 else ""}</span>
-          </h2>
-          <table style="width:100%;border-collapse:collapse;">
-            <tbody>{''.join(rows)}</tbody>
-          </table>
-        </div>""")
+    rows_html = ""
+    for _, company, job, emoji, reason in all_rows:
+        loc = job["location"] or "Remote"
+        shade = {"🟢": "#f0faf4", "🟡": "#fffbf0", "⚪": "#ffffff"}[emoji]
+        rows_html += f"""
+        <tr style="background:{shade};border-bottom:1px solid #efefef;">
+          <td style="padding:10px 12px;vertical-align:middle;font-size:13px;font-weight:600;color:#333;white-space:nowrap;">{company}</td>
+          <td style="padding:10px 12px;vertical-align:middle;">
+            <a href="{job['url']}" style="color:#1565C0;font-weight:600;text-decoration:none;font-size:13px;">{job['title']}</a>
+            <div style="color:#888;font-size:11px;margin-top:2px;">{loc}</div>
+          </td>
+          <td style="padding:10px 12px;vertical-align:middle;text-align:center;font-size:17px;">{emoji}</td>
+          <td style="padding:10px 12px;vertical-align:middle;font-size:12px;color:#555;">{reason}</td>
+        </tr>"""
 
-    body = "\n".join(sections) if sections else (
-        '<p style="color:#999;text-align:center;padding:32px 0;font-size:14px;">'
-        'No new postings today. Check back tomorrow!</p>'
-    )
+    if all_rows:
+        body = f"""
+        <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+          <thead>
+            <tr style="background:#f5f5f5;border-bottom:2px solid #e0e0e0;">
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;">Company</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;">Role</th>
+              <th style="padding:9px 12px;text-align:center;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;">Fit</th>
+              <th style="padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>{rows_html}</tbody>
+        </table>"""
+    else:
+        body = '<p style="color:#999;text-align:center;padding:32px 0;font-size:14px;">No new postings today. Check back tomorrow!</p>'
 
     first_run_banner = ""
     if is_first_run:
@@ -234,7 +232,7 @@ def build_email(results: list[dict], is_first_run: bool) -> str:
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
-  <div style="max-width:680px;margin:20px auto;background:#fff;border-radius:10px;
+  <div style="max-width:820px;margin:20px auto;background:#fff;border-radius:10px;
               overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
 
     <div style="background:#1a1a2e;padding:22px 28px;">

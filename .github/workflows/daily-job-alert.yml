@@ -3,9 +3,9 @@ name: Daily Job Alert
 
 on:
   schedule:
-    # 8:00 AM EST (UTC-5) = 13:00 UTC
-    # Note: shifts to 9 AM during summer daylight saving time (EDT = UTC-4)
-    - cron: '0 13 * * *'
+    # 7:00 AM PST (UTC-8) = 15:00 UTC
+    # Note: shifts to 8 AM PDT during daylight saving time (Mar–Nov)
+    - cron: '0 15 * * *'
   workflow_dispatch:  # Allows manual "Run workflow" from the GitHub UI
 
 concurrency:

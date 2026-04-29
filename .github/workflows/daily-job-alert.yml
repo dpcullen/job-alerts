@@ -3,9 +3,9 @@ name: Daily Job Alert
 
 on:
   schedule:
-    # 6:00 AM PDT (UTC-7) = 13:00 UTC
-    # Note: shifts to 5 AM PST during standard time (Nov–Mar)
-    - cron: '0 13 * * *'
+    # Target: ~6 AM PDT. GitHub free tier runs ~2hrs late, so scheduling at 11:00 UTC
+    # (4 AM PDT) to compensate. Arrives ~6 AM PDT / ~5 AM PST in winter.
+    - cron: '0 11 * * *'
   workflow_dispatch:  # Allows manual "Run workflow" from the GitHub UI
 
 concurrency:
